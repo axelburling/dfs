@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package node;
+
+option go_package = "github.com/axelburling/dfs/pkg/node/grpc/pb;pb";
+
+service NodeService {
+    rpc Health(HealthRequest) returns (HealthResponse);
+    rpc DiskSpace(Empty) returns (DiskSpaceResponse);
+    rpc Init(Empty) returns (InitResponse);
+}
+
+message HealthRequest {
+    optional bool readOnly = 1;
+}
+
+message HealthResponse {
+    string hostname = 1;
+    bool alive = 2;
+    bool readOnly = 3;
+}
+
+message DiskSpaceResponse {
+    uint64 total = 1;
+    uint64 free = 2;
+}
+
+message Chunk {
+    string id = 1;
+    string hash = 2;
+    int64 size = 3;
+}
+
+message InitResponse {
+    repeated Chunk chunks = 1;
+    HealthResponse health = 2;
+}
+
+message Empty {}

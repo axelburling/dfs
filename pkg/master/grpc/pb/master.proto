@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package master;
+
+option go_package = "github.com/axelburling/dfs/pkg/master/grpc/pb;pb";
+
+service MasterService {
+    rpc Register (Node) returns (RegistrationResponse);
+}
+
+message Node {
+    UUID id = 1;
+    string addr = 2;
+    string grpcAddr = 3;
+    bool readOnly = 4;
+    string hostname = 5;
+    int64 totalSpace = 6;
+    int64 freeSpace = 7;
+}
+
+message RegistrationResponse {
+    bool registered = 1;
+    string node_id = 2;
+}
+
+message UUID {
+    bytes value = 1;
+}

@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package pubsub;
+
+option go_package = "github.com/axelburling/dfs/pkg/pubsub/grpc/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+
+service Publisher {
+    rpc Publish(PublishRequest) returns (PublishResponse);
+    rpc CreateTopic(Topic) returns (Topic);
+}
+
+service Subscriber {
+    rpc CreateSubscription(Subscription) returns (Subscription);
+    rpc Pull(PullRequest) returns (PullResponse);
+    rpc StreamingPull(stream StreamingPullRequest) returns (stream StreamingPullResponse) {}
+    rpc Acknowledge(AcknowledgeRequest) returns (google.protobuf.Empty);
+}
+
+message StreamingPullResponse {
+    message AcknowledgeConfirmation {
+        repeated string ack_ids = 1;
+
+        repeated string invalid_ack_ids = 2;
+    }
+
+    repeated ReceivedMessage received_messages = 1;
+
+    AcknowledgeConfirmation acknowledge_confirmation = 2;
+}
+
+message StreamingPullRequest {
+    string subscription = 1;
+
+    string topic = 2;
+
+    repeated string ack_ids = 3;
+
+    repeated string filter = 4;
+
+    optional string ignore_from = 5;
+}
+
+message PullRequest {
+    string subscription = 1;
+
+    string topic = 2;
+
+    optional bool return_immediately = 3;
+
+    int32 max_messages = 4;
+}
+
+message PullResponse {
+    repeated ReceivedMessage received_messages = 1;
+}
+
+message PublishResponse {
+    repeated string message_ids = 1;
+}
+
+message PublishRequest {
+    string topic = 1;
+
+    string sender = 2;
+
+    repeated PubsubMessage messages = 3;
+
+    repeated google.protobuf.Duration deadlines = 4;
+}
+
+message PubsubMessage {
+    string action = 1;
+
+    optional bytes data = 2;
+
+    map<string, string> attributes = 3;
+
+    string message_id = 4;
+
+    google.protobuf.Timestamp publish_time = 5;
+}
+
+message ReceivedMessage {
+    optional string ack_id = 1;
+
+    optional PubsubMessage message = 2;
+
+    optional int32 delivery_attempt = 3;
+}
+
+message Topic {
+    enum State {
+        // Default value. This value is unused.
+        STATE_UNSPECIFIED = 0;
+
+        // The topic does not have any persistent errors.
+        ACTIVE = 1;
+
+    }
+
+    string name = 1;
+
+    State state = 2;
+
+    optional google.protobuf.Duration message_retention_duration = 3;
+}
+
+message AcknowledgeRequest {
+    string subscription = 1;
+
+    string topic = 2;
+
+    repeated string ack_ids = 3;
+}
+
+message Subscription {
+    string name = 1;
+
+    string topic = 2;
+
+    optional int32 ack_deadline_seconds = 3;
+}

@@ -84,7 +84,7 @@ to quickly create a Cobra application.`,
 				case msg := <-messageChan:
 
 					if ms.Action(msg.Action) == ms.NodeAdd {
-						_, data, err := ms.Decode[ms.NodeAddReq](msg)
+						data, err := ms.Decode[ms.NodeAddReq](msg)
 
 						if err != nil {
 							log.Warn("could not decode message", zap.Error(err))

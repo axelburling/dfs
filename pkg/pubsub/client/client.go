@@ -30,12 +30,16 @@ type PubSub struct {
 type Topic struct {
 	pool *pool.GrpcPool
 	Name string
+
+	id string
 }
 
 type Subscription struct {
 	pool  *pool.GrpcPool
 	Name  string
 	Topic string
+
+	id string
 }
 
 func NewClient(target string, size int, id string) (*PubSub, error) {
@@ -68,7 +72,7 @@ func (p *PubSub) CreateTopic(ctx context.Context, name string) (*Topic, error) {
 		return nil, err
 	}
 
-	return &Topic{Name: top.Name, pool: p.pool}, nil
+	return &Topic{Name: top.Name, pool: p.pool, id: p.id}, nil
 }
 
 func (t *Topic) Publish(ctx context.Context, msgs []*message.Message, deadlinesDur []time.Duration) ([]string, error) {
@@ -135,7 +139,7 @@ func (t *Topic) CreateSubscription(ctx context.Context, name string) (*Subscript
 		return nil, err
 	}
 
-	return &Subscription{Name: sub.Name, Topic: t.Name, pool: t.pool}, nil
+	return &Subscription{Name: sub.Name, Topic: t.Name, pool: t.pool, id: t.id}, nil
 }
 
 func (t *Topic) NewMessage(action string, data []byte) *message.Message {
@@ -164,6 +168,7 @@ func (s *Subscription) Receive(ctx context.Context, messageChan chan *message.Me
 		Subscription: s.Name,
 		Filter:       actions,
 		AckIds:       []string{},
+		IgnoreFrom:   &s.id,
 	}
 
 	pull.Send(resp)
@@ -206,6 +211,8 @@ func (s *Subscription) Receive(ctx context.Context, messageChan chan *message.Me
 					PublishedTime: msg.Message.PublishTime.AsTime(),
 					AckChan:       ackChan,
 				}
+
+				ackChan <- *msg.AckId
 			}
 		}
 	}

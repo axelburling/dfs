@@ -171,11 +171,11 @@ func (s *SubscriberService) StreamingPull(srv grpc.BidiStreamingServer[pb.Stream
 						var receivedMessages []*pb.ReceivedMessage
 						unUsedMessages := make([]string, 0)
 						for _, msg := range messages {
-
 							if msg.Sender == sender {
 								unUsedMessages = append(unUsedMessages, msg.ID)
 								continue
 							}
+
 
 							if len(filters) == 0 {
 								receivedMessages = append(receivedMessages, convertMessage(msg))
@@ -190,8 +190,8 @@ func (s *SubscriberService) StreamingPull(srv grpc.BidiStreamingServer[pb.Stream
 								}
 							}
 						}
-						if len(receivedMessages) > 0 {
 
+						if len(receivedMessages) > 0 {
 							if len(unUsedMessages) > 0 {
 								s.Scheduler.AckMessages(topic, subscription, unUsedMessages)
 							}

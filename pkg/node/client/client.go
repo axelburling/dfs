@@ -15,6 +15,7 @@ type Node struct {
 	addr     string
 	grpcAddr string
 	ReadOnly bool
+	Alive    bool
 }
 
 func NewNode(addr, grpcAddr string) (*Node, error) {
@@ -41,5 +42,6 @@ func NewNode(addr, grpcAddr string) (*Node, error) {
 		addr:     addr,
 		grpcAddr: grpcAddr,
 		ReadOnly: res.ReadOnly,
+		Alive:    true,
 	}, nil
 }

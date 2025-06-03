@@ -153,7 +153,7 @@ func (n *Node) WithPubSub() *Node {
 		n.log.Fatal("failed to create pubsub topic", zap.Error(err))
 	}
 
-	subscription, err := topic.CreateSubscription(n.ctx, n.config.PubSub.Subscription)
+	subscription, err := topic.CreateSubscription(n.ctx, n.id)
 
 	if err != nil {
 		n.log.Fatal("failed to create pubsub subscription", zap.Error(err))
@@ -213,11 +213,13 @@ func (n *Node) Register() {
 		n.log.Fatal("failed to create message", zap.Error(err))
 	}
 
-	ids, err := n.topic.Publish(n.ctx, []*message.Message{
+	ids, err := n.pubsub.Topic.Publish(n.ctx, []*message.Message{
 		ms,
 	}, nil)
 
 	if err != nil || len(ids) != 1 {
 		n.log.Fatal("failed to register node", zap.String("id", n.id), zap.Error(err))
 	}
+
+	n.log.Debug("Successfully register node", zap.String("node id", n.id), zap.Strings("ids", ids))
 }

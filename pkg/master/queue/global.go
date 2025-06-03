@@ -19,6 +19,12 @@ type GlobalQueue struct {
 	nextNodeIndex  atomic.Uint64
 	mu             sync.Mutex
 	nodes          []*client.Node
+	nodeChangeChan chan nodeChange
+}
+
+type nodeChange struct {
+	node *client.Node
+	ok bool
 }
 
 func NewGlobalQueue(log *log.Logger) *GlobalQueue {
@@ -37,6 +43,8 @@ func NewGlobalQueue(log *log.Logger) *GlobalQueue {
 		go gq.worker()
 	}
 
+	go gq.monitorNodeChange()
+
 	return gq
 }
 
@@ -54,7 +62,7 @@ func (gq *GlobalQueue) pickNodes(replicationFactor int64) []*client.Node {
 
 		node := gq.nodes[idx]
 
-		if node.ReadOnly {
+		if node.ReadOnly || !node.Alive {
 			continue
 		}
 
@@ -79,6 +87,10 @@ func (gq *GlobalQueue) AddNode(node *client.Node) {
 	gq.nodeQueues = append(gq.nodeQueues, nq)
 }
 
+func (gq *GlobalQueue) MarkNode(node *client.Node, ok bool) {
+
+}
+
 func (gq *GlobalQueue) worker() {
 	for {
 		select {
@@ -91,6 +103,23 @@ func (gq *GlobalQueue) worker() {
 				gq.enqueueJobToNode(job, node.ID)
 			}
 			gq.log.Debug("got global job", zap.String("id", job.ID))
+		}
+	}
+}
+
+func (gq *GlobalQueue) monitorNodeChange() {
+	for {
+		select {
+		case <-gq.done:
+			return
+		case ch := <-gq.nodeChangeChan:
+			for _, n := range gq.nodes {
+				if n.ID == ch.node.ID {
+					gq.mu.Lock()
+					n.Alive = ch.ok
+					gq.mu.Unlock()
+				}
+			}
 		}
 	}
 }

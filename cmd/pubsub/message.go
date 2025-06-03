@@ -37,15 +37,13 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		fmt.Println(ms)
-
-		t, d, err := msg.Decode[msg.NodeAddReq](ms)
+		d, err := msg.Decode[msg.NodeAddReq](ms)
 
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(t, d)
+		fmt.Println(d)
 	},
 }
 

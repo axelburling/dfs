@@ -1,2 +1,4 @@
 data
 .env
+docker/dev/pg_data
+*.txt

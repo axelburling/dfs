@@ -14,6 +14,7 @@ type DB struct {
 	ctx context.Context
 
 	Types utils.Types
+	Conv  utils.Conv
 }
 
 func New(ctx context.Context, connStr string) (*DB, error) {
@@ -31,10 +32,13 @@ func New(ctx context.Context, connStr string) (*DB, error) {
 		return nil, err
 	}
 
+	ty := utils.Types{}
+
 	return &DB{
 		Queries: q,
 		ctx:     ctx,
-		Types:   utils.Types{},
+		Types:   ty,
+		Conv:    utils.NewConv(ty),
 	}, nil
 }
 

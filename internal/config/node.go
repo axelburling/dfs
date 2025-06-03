@@ -21,7 +21,6 @@ func newNodeConfig(log *log.Logger) *NodeConfig {
 	keyStr := getEnv("encryption_key", log)
 	pubsubAddr := getEnv("pubsub_address", log)
 	pubsubTopic := getEnv("pubsub_topic", log)
-	pubsubSubscription := getEnv("pubsub_subscription", log)
 	pubsubPoolSizeStr := getEnv("node_pubsub_pool_size", log)
 
 	key, err := base64.StdEncoding.DecodeString(keyStr)
@@ -48,7 +47,6 @@ func newNodeConfig(log *log.Logger) *NodeConfig {
 			Addr:         pubsubAddr,
 			PoolSize:     pubsubPoolSize,
 			Topic:        pubsubTopic,
-			Subscription: pubsubSubscription,
 		},
 	}
 }

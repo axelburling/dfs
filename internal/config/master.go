@@ -20,9 +20,8 @@ func newMasterConfig(log *log.Logger) *MasterConfig {
 	gaddr := getEnv("grpc", log)
 	sizeStr := getEnv("chunk_size", log)
 	dbConn := getEnv("database_url", log)
-	pubsubAddr := getEnv("pubsub_addr", log)
+	pubsubAddr := getEnv("pubsub_address", log)
 	pubsubTopic := getEnv("pubsub_topic", log)
-	pubsubSubscription := getEnv("pubsub_subscription", log)
 	pubsubPoolSizeStr := getEnv("master_pubsub_pool_size", log)
 
 	size, err := strconv.Atoi(sizeStr)
@@ -46,7 +45,6 @@ func newMasterConfig(log *log.Logger) *MasterConfig {
 			Addr:         pubsubAddr,
 			PoolSize:     pubsubPoolSize,
 			Topic:        pubsubTopic,
-			Subscription: pubsubSubscription,
 		},
 	}
 }

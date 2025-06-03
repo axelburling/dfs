@@ -1,0 +1,11 @@
+services:
+  quick-db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: uNdVMyUxiUCYg8leB7sM
+      POSTGRES_USER: E4WsGCmaWC
+      POSTGRES_DB: olBeRQBmA5
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data

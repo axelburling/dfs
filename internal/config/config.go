@@ -56,5 +56,4 @@ type pubsubClientConfig struct {
 	Addr         string
 	PoolSize     int
 	Topic        string
-	Subscription string
 }
